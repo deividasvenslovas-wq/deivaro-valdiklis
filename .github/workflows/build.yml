@@ -40,7 +40,7 @@ jobs:
           android {
             namespace 'lt.deivaro.valdiklis'
             compileSdk 34
-            defaultConfig { applicationId 'lt.deivaro.valdiklis'; minSdk 26; targetSdk 34; versionCode 1; versionName '1.0' }
+            defaultConfig { applicationId 'lt.deivaro.valdiklis'; minSdk 26; targetSdk 34; versionCode 2; versionName '1.1' }
             compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
           }
           DVEOF
@@ -98,7 +98,7 @@ jobs:
               <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Atviros pozicijos" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold"/>
               <TextView android:id="@+id/total" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="…" android:textColor="#C9A24A" android:textSize="16sp" android:textStyle="bold"/>
             </LinearLayout>
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="8dp" android:background="#2A2A2E"/>
+            <FrameLayout android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="8dp" android:background="#2A2A2E"/>
               <LinearLayout android:id="@+id/row0" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
                 <TextView android:id="@+id/sym0" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
                 <TextView android:id="@+id/side0" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
@@ -136,7 +136,7 @@ jobs:
                 <TextView android:id="@+id/pl5" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
               </LinearLayout>
             <TextView android:id="@+id/msg" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="6dp" android:textColor="#A8A8AE" android:textSize="12sp" android:visibility="gone"/>
-            <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+            <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
             <TextView android:id="@+id/upd" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="end" android:textColor="#6E6E75" android:textSize="11sp"/>
           </LinearLayout>
           DVEOF
