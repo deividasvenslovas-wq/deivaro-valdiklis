@@ -40,7 +40,7 @@ jobs:
           android {
             namespace 'lt.deivaro.valdiklis'
             compileSdk 34
-            defaultConfig { applicationId 'lt.deivaro.valdiklis'; minSdk 26; targetSdk 34; versionCode 2; versionName '1.1' }
+            defaultConfig { applicationId 'lt.deivaro.valdiklis'; minSdk 26; targetSdk 34; versionCode 3; versionName '1.2' }
             compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
           }
           DVEOF
@@ -84,9 +84,32 @@ jobs:
           mkdir -p app_src/app/src/main/res/drawable
           cat > app_src/app/src/main/res/drawable/logo.xml <<'DVEOF'
           <?xml version="1.0" encoding="utf-8"?>
-          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
-            <path android:fillColor="#0B0B0C" android:pathData="M0,0h48v48h-48z"/>
-            <path android:fillColor="#C9A24A" android:pathData="M14,10h10c9,0 14,6 14,14s-5,14 -14,14h-10zM19,15v18h5c5.5,0 9,-3.5 9,-9s-3.5,-9 -9,-9z"/>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="100" android:viewportHeight="100">
+            <path android:fillColor="#0B0B0C" android:strokeColor="#C9A24A" android:strokeWidth="1.5" android:pathData="M21,1 H79 A20,20 0 0 1 99,21 V79 A20,20 0 0 1 79,99 H21 A20,20 0 0 1 1,79 V21 A20,20 0 0 1 21,1 Z"/>
+            <path android:fillColor="#E8DCC2" android:pathData="M20 31 Q5 31 4 12 Q11 24 23 26 Z"/>
+            <path android:fillColor="#E8DCC2" android:pathData="M36 31 Q51 31 52 12 Q45 24 33 26 Z"/>
+            <path android:fillColor="#8A4F2A" android:pathData="M19 35 Q9 35 5 42 Q14 43 21 39 Z"/>
+            <path android:fillColor="#8A4F2A" android:pathData="M37 35 Q47 35 51 42 Q42 43 35 39 Z"/>
+            <path android:fillColor="#B06A3B" android:pathData="M18 28 Q28 23 38 28 L37 47 Q36 53 34 56 L22 56 Q20 53 19 47 Z"/>
+            <path android:fillColor="#8A4F2A" android:pathData="M24 26 Q28 31 32 26 Q28 24 24 26 Z"/>
+            <path android:fillColor="#D79A6C" android:pathData="M19,57 a9,6.5 0 1,0 18,0 a9,6.5 0 1,0 -18,0"/>
+            <path android:fillColor="#3A1F10" android:pathData="M23.4,57 a1.6,1.2 0 1,0 3.2,0 a1.6,1.2 0 1,0 -3.2,0"/>
+            <path android:fillColor="#3A1F10" android:pathData="M29.4,57 a1.6,1.2 0 1,0 3.2,0 a1.6,1.2 0 1,0 -3.2,0"/>
+            <path android:strokeColor="#C9A24A" android:strokeWidth="1.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M25,63 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0"/>
+            <path android:fillColor="#0B0B0C" android:pathData="M21.2,40 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0"/>
+            <path android:fillColor="#0B0B0C" android:pathData="M31.2,40 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0"/>
+            <path android:fillColor="#6B4C36" android:pathData="M55.5,30 a6.5,6.5 0 1,0 13.0,0 a6.5,6.5 0 1,0 -13.0,0"/>
+            <path android:fillColor="#6B4C36" android:pathData="M79.5,30 a6.5,6.5 0 1,0 13.0,0 a6.5,6.5 0 1,0 -13.0,0"/>
+            <path android:fillColor="#4A3324" android:pathData="M58.8,30 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0"/>
+            <path android:fillColor="#4A3324" android:pathData="M82.8,30 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0"/>
+            <path android:fillColor="#7A5A44" android:pathData="M58,44 a16,16 0 1,0 32,0 a16,16 0 1,0 -32,0"/>
+            <path android:fillColor="#A07E62" android:pathData="M66,52 a8,6.5 0 1,0 16,0 a8,6.5 0 1,0 -16,0"/>
+            <path android:fillColor="#1A120C" android:pathData="M70.8,49 a3.2,2.2 0 1,0 6.4,0 a3.2,2.2 0 1,0 -6.4,0"/>
+            <path android:strokeColor="#1A120C" android:strokeWidth="1" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M70.5 54.5 Q74 58 77.5 54.5"/>
+            <path android:fillColor="#0B0B0C" android:pathData="M66.2,40 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0"/>
+            <path android:fillColor="#0B0B0C" android:pathData="M78.2,40 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0"/>
+            <path android:strokeColor="#3FCB7E" android:strokeWidth="2.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M14,88 L28,80 L38,84 L50,74"/>
+            <path android:strokeColor="#E24B4A" android:strokeWidth="2.4" android:strokeLineCap="round" android:strokeLineJoin="round" android:pathData="M50,74 L62,86 L74,82 L86,90"/>
           </vector>
           DVEOF
           mkdir -p app_src/app/src/main/res/layout
@@ -303,6 +326,10 @@ jobs:
             static void msg(RemoteViews v, String t) { v.setViewVisibility(R.id.msg, View.VISIBLE); v.setTextViewText(R.id.msg, t); }
           }
           DVEOF
+      - name: Pastovus raktas
+        run: |
+          mkdir -p ~/.android
+          echo "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" | base64 -d > ~/.android/debug.keystore
       - name: Surinkti APK
         working-directory: app_src
         run: gradle assembleDebug --no-daemon
