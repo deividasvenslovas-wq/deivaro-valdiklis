@@ -1,0 +1,315 @@
+name: Deivaro valdiklis
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+      - name: Sukurti projekta
+        run: |
+          mkdir -p app_src/.
+          cat > app_src/settings.gradle <<'DVEOF'
+          pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+          dependencyResolutionManagement { repositories { google(); mavenCentral() } }
+          rootProject.name = 'DeivaroValdiklis'
+          include ':app'
+          DVEOF
+          mkdir -p app_src/.
+          cat > app_src/build.gradle <<'DVEOF'
+          plugins { id 'com.android.application' version '8.5.2' apply false }
+          DVEOF
+          mkdir -p app_src/.
+          cat > app_src/gradle.properties <<'DVEOF'
+          android.useAndroidX=true
+          org.gradle.jvmargs=-Xmx2g
+          DVEOF
+          mkdir -p app_src/app
+          cat > app_src/app/build.gradle <<'DVEOF'
+          plugins { id 'com.android.application' }
+          android {
+            namespace 'lt.deivaro.valdiklis'
+            compileSdk 34
+            defaultConfig { applicationId 'lt.deivaro.valdiklis'; minSdk 26; targetSdk 34; versionCode 1; versionName '1.0' }
+            compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+          }
+          DVEOF
+          mkdir -p app_src/app/src/main
+          cat > app_src/app/src/main/AndroidManifest.xml <<'DVEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.INTERNET"/>
+            <application android:label="Deivaro" android:icon="@drawable/logo" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="false">
+              <activity android:name=".MainActivity" android:exported="true">
+                <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+              </activity>
+              <receiver android:name=".PositionsWidget" android:exported="true" android:label="Deivaro pozicijos">
+                <intent-filter>
+                  <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                  <action android:name="lt.deivaro.valdiklis.REFRESH"/>
+                </intent-filter>
+                <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_info"/>
+              </receiver>
+            </application>
+          </manifest>
+          DVEOF
+          mkdir -p app_src/app/src/main/res/xml
+          cat > app_src/app/src/main/res/xml/widget_info.xml <<'DVEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+            android:minWidth="250dp" android:minHeight="110dp" android:targetCellWidth="4" android:targetCellHeight="2"
+            android:resizeMode="horizontal|vertical" android:updatePeriodMillis="1800000"
+            android:initialLayout="@layout/widget" android:previewLayout="@layout/widget" android:widgetCategory="home_screen"/>
+          DVEOF
+          mkdir -p app_src/app/src/main/res/drawable
+          cat > app_src/app/src/main/res/drawable/bg.xml <<'DVEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android"><solid android:color="#0B0B0C"/><corners android:radius="24dp"/></shape>
+          DVEOF
+          mkdir -p app_src/app/src/main/res/drawable
+          cat > app_src/app/src/main/res/drawable/ring.xml <<'DVEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval"><solid android:color="#0B0B0C"/><stroke android:width="1.5dp" android:color="#C9A24A"/></shape>
+          DVEOF
+          mkdir -p app_src/app/src/main/res/drawable
+          cat > app_src/app/src/main/res/drawable/logo.xml <<'DVEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
+            <path android:fillColor="#0B0B0C" android:pathData="M0,0h48v48h-48z"/>
+            <path android:fillColor="#C9A24A" android:pathData="M14,10h10c9,0 14,6 14,14s-5,14 -14,14h-10zM19,15v18h5c5.5,0 9,-3.5 9,-9s-3.5,-9 -9,-9z"/>
+          </vector>
+          DVEOF
+          mkdir -p app_src/app/src/main/res/layout
+          cat > app_src/app/src/main/res/layout/widget.xml <<'DVEOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/root" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="@drawable/bg" android:padding="14dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+              <TextView android:layout_width="26dp" android:layout_height="26dp" android:background="@drawable/ring" android:gravity="center" android:text="D" android:textColor="#C9A24A" android:textStyle="bold" android:textSize="13sp"/>
+              <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="8dp" android:text="Atviros pozicijos" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold"/>
+              <TextView android:id="@+id/total" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="…" android:textColor="#C9A24A" android:textSize="16sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="8dp" android:background="#2A2A2E"/>
+              <LinearLayout android:id="@+id/row0" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
+                <TextView android:id="@+id/sym0" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
+                <TextView android:id="@+id/side0" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/lot0" android:layout_width="48dp" android:layout_height="wrap_content" android:textColor="#A8A8AE" android:textSize="13sp"/>
+                <TextView android:id="@+id/pl0" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
+              </LinearLayout>
+              <LinearLayout android:id="@+id/row1" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
+                <TextView android:id="@+id/sym1" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
+                <TextView android:id="@+id/side1" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/lot1" android:layout_width="48dp" android:layout_height="wrap_content" android:textColor="#A8A8AE" android:textSize="13sp"/>
+                <TextView android:id="@+id/pl1" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
+              </LinearLayout>
+              <LinearLayout android:id="@+id/row2" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
+                <TextView android:id="@+id/sym2" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
+                <TextView android:id="@+id/side2" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/lot2" android:layout_width="48dp" android:layout_height="wrap_content" android:textColor="#A8A8AE" android:textSize="13sp"/>
+                <TextView android:id="@+id/pl2" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
+              </LinearLayout>
+              <LinearLayout android:id="@+id/row3" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
+                <TextView android:id="@+id/sym3" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
+                <TextView android:id="@+id/side3" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/lot3" android:layout_width="48dp" android:layout_height="wrap_content" android:textColor="#A8A8AE" android:textSize="13sp"/>
+                <TextView android:id="@+id/pl3" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
+              </LinearLayout>
+              <LinearLayout android:id="@+id/row4" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
+                <TextView android:id="@+id/sym4" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
+                <TextView android:id="@+id/side4" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/lot4" android:layout_width="48dp" android:layout_height="wrap_content" android:textColor="#A8A8AE" android:textSize="13sp"/>
+                <TextView android:id="@+id/pl4" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
+              </LinearLayout>
+              <LinearLayout android:id="@+id/row5" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="5dp" android:visibility="gone">
+                <TextView android:id="@+id/sym5" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="#FFFFFF" android:textSize="13sp" android:textStyle="bold" android:maxLines="1"/>
+                <TextView android:id="@+id/side5" android:layout_width="56dp" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/lot5" android:layout_width="48dp" android:layout_height="wrap_content" android:textColor="#A8A8AE" android:textSize="13sp"/>
+                <TextView android:id="@+id/pl5" android:layout_width="76dp" android:layout_height="wrap_content" android:gravity="end" android:textSize="13sp" android:textStyle="bold"/>
+              </LinearLayout>
+            <TextView android:id="@+id/msg" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="6dp" android:textColor="#A8A8AE" android:textSize="12sp" android:visibility="gone"/>
+            <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
+            <TextView android:id="@+id/upd" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="end" android:textColor="#6E6E75" android:textSize="11sp"/>
+          </LinearLayout>
+          DVEOF
+          mkdir -p app_src/app/src/main/java/lt/deivaro/valdiklis
+          cat > app_src/app/src/main/java/lt/deivaro/valdiklis/MainActivity.java <<'DVEOF'
+          package lt.deivaro.valdiklis;
+          
+          import android.app.Activity;
+          import android.content.Intent;
+          import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          
+          public class MainActivity extends Activity {
+            private WebView web;
+            private final Handler h = new Handler(Looper.getMainLooper());
+            private final Runnable grab = new Runnable() { public void run() { readToken(); h.postDelayed(this, 3000); } };
+          
+            @Override protected void onCreate(Bundle b) {
+              super.onCreate(b);
+              web = new WebView(this);
+              WebSettings s = web.getSettings();
+              s.setJavaScriptEnabled(true);
+              s.setDomStorageEnabled(true);
+              web.setWebViewClient(new WebViewClient() {
+                @Override public void onPageFinished(WebView v, String url) { readToken(); }
+              });
+              setContentView(web);
+              web.loadUrl(PositionsWidget.BASE + "/");
+            }
+          
+            private void readToken() {
+              if (web == null) return;
+              web.evaluateJavascript("(localStorage.getItem('dvro_token')||localStorage.getItem('dv_token')||'')", v -> {
+                if (v == null) return;
+                String t = v.replace("\"", "");
+                if (t.length() < 8 || t.equals("null")) return;
+                String old = getSharedPreferences("dv", MODE_PRIVATE).getString("token", "");
+                if (!t.equals(old)) {
+                  getSharedPreferences("dv", MODE_PRIVATE).edit().putString("token", t).apply();
+                  sendBroadcast(new Intent(PositionsWidget.ACTION).setPackage(getPackageName()));
+                }
+              });
+            }
+          
+            @Override protected void onResume() { super.onResume(); h.post(grab); }
+            @Override protected void onPause() { h.removeCallbacks(grab); super.onPause(); }
+            @Override public void onBackPressed() { if (web != null && web.canGoBack()) web.goBack(); else super.onBackPressed(); }
+          }
+          DVEOF
+          mkdir -p app_src/app/src/main/java/lt/deivaro/valdiklis
+          cat > app_src/app/src/main/java/lt/deivaro/valdiklis/PositionsWidget.java <<'DVEOF'
+          package lt.deivaro.valdiklis;
+          
+          import android.app.AlarmManager;
+          import android.app.PendingIntent;
+          import android.appwidget.AppWidgetManager;
+          import android.appwidget.AppWidgetProvider;
+          import android.content.ComponentName;
+          import android.content.Context;
+          import android.content.Intent;
+          import android.os.SystemClock;
+          import android.view.View;
+          import android.widget.RemoteViews;
+          import org.json.JSONArray;
+          import org.json.JSONObject;
+          import java.io.BufferedReader;
+          import java.io.InputStreamReader;
+          import java.net.HttpURLConnection;
+          import java.net.URL;
+          import java.text.SimpleDateFormat;
+          import java.util.Date;
+          import java.util.Locale;
+          
+          public class PositionsWidget extends AppWidgetProvider {
+            public static final String BASE = "https://trade-production-bbfe.up.railway.app";
+            public static final String ACTION = "lt.deivaro.valdiklis.REFRESH";
+            static final int GREEN = 0xFF3FCB7E, RED = 0xFFFF7A7A, GOLD = 0xFFC9A24A;
+            static final int[] ROW = {R.id.row0, R.id.row1, R.id.row2, R.id.row3, R.id.row4, R.id.row5};
+            static final int[] SYM = {R.id.sym0, R.id.sym1, R.id.sym2, R.id.sym3, R.id.sym4, R.id.sym5};
+            static final int[] SIDE = {R.id.side0, R.id.side1, R.id.side2, R.id.side3, R.id.side4, R.id.side5};
+            static final int[] LOT = {R.id.lot0, R.id.lot1, R.id.lot2, R.id.lot3, R.id.lot4, R.id.lot5};
+            static final int[] PL = {R.id.pl0, R.id.pl1, R.id.pl2, R.id.pl3, R.id.pl4, R.id.pl5};
+          
+            @Override public void onUpdate(Context c, AppWidgetManager m, int[] ids) { schedule(c); refresh(c); }
+            @Override public void onEnabled(Context c) { schedule(c); }
+            @Override public void onDisabled(Context c) { ((AlarmManager) c.getSystemService(Context.ALARM_SERVICE)).cancel(tick(c)); }
+            @Override public void onReceive(Context c, Intent i) {
+              super.onReceive(c, i);
+              if (ACTION.equals(i.getAction())) refresh(c);
+            }
+          
+            static PendingIntent tick(Context c) {
+              return PendingIntent.getBroadcast(c, 1, new Intent(ACTION).setClass(c, PositionsWidget.class), PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+            }
+            static void schedule(Context c) {
+              AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+              am.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 60000, 60000, tick(c));
+            }
+          
+            static String fmt(double v) { return (v > 0 ? "+" : v < 0 ? "\u2212" : "") + String.format(Locale.US, "%.2f", Math.abs(v)); }
+            static String lot(double v) { String s = String.format(Locale.US, "%.2f", v); return s; }
+          
+            void refresh(final Context c) {
+              final PendingResult pr = goAsync();
+              new Thread(() -> {
+                try { draw(c); } finally { pr.finish(); }
+              }).start();
+            }
+          
+            static void draw(Context c) {
+              RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget);
+              Intent open = new Intent(c, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+              v.setOnClickPendingIntent(R.id.root, PendingIntent.getActivity(c, 0, open, PendingIntent.FLAG_IMMUTABLE));
+              String token = c.getSharedPreferences("dv", Context.MODE_PRIVATE).getString("token", "");
+              String upd = new SimpleDateFormat("HH:mm", Locale.US).format(new Date());
+              if (token.isEmpty()) {
+                msg(v, "Paspausk ir prisijunk prie platformos");
+              } else {
+                try {
+                  HttpURLConnection h = (HttpURLConnection) new URL(BASE + "/api/state").openConnection();
+                  h.setRequestProperty("x-token", token);
+                  h.setConnectTimeout(10000); h.setReadTimeout(15000);
+                  int code = h.getResponseCode();
+                  if (code == 401 || code == 403) { msg(v, "Prisijungimas baigėsi - paspausk"); }
+                  else if (code != 200) { msg(v, "Platforma neatsako (" + code + ")"); }
+                  else {
+                    BufferedReader r = new BufferedReader(new InputStreamReader(h.getInputStream(), "UTF-8"));
+                    StringBuilder sb = new StringBuilder(); String line;
+                    while ((line = r.readLine()) != null) sb.append(line);
+                    JSONArray pos = new JSONObject(sb.toString()).optJSONArray("pos");
+                    if (pos == null) pos = new JSONArray();
+                    double total = 0;
+                    for (int i = 0; i < pos.length(); i++) total += pos.getJSONObject(i).optDouble("p", 0);
+                    int n = Math.min(pos.length(), ROW.length);
+                    for (int i = 0; i < n; i++) {
+                      JSONObject p = pos.getJSONObject(i);
+                      boolean buy = "buy".equalsIgnoreCase(p.optString("y"));
+                      double pl = p.optDouble("p", 0);
+                      v.setViewVisibility(ROW[i], View.VISIBLE);
+                      v.setTextViewText(SYM[i], p.optString("s"));
+                      v.setTextViewText(SIDE[i], buy ? "BUY" : "SELL");
+                      v.setTextColor(SIDE[i], buy ? GREEN : RED);
+                      v.setTextViewText(LOT[i], lot(p.optDouble("v", 0)));
+                      v.setTextViewText(PL[i], fmt(pl));
+                      v.setTextColor(PL[i], pl >= 0 ? GREEN : RED);
+                    }
+                    if (pos.length() == 0) msg(v, "Atvirų pozicijų nėra");
+                    else if (pos.length() > ROW.length) msg(v, "+" + (pos.length() - ROW.length) + " daugiau");
+                    v.setTextViewText(R.id.total, pos.length() == 0 ? "0.00" : fmt(total));
+                    v.setTextColor(R.id.total, pos.length() == 0 ? GOLD : (total >= 0 ? GREEN : RED));
+                  }
+                } catch (Exception e) {
+                  msg(v, "Nėra ryšio");
+                }
+              }
+              v.setTextViewText(R.id.upd, "Atnaujinta " + upd);
+              AppWidgetManager.getInstance(c).updateAppWidget(new ComponentName(c, PositionsWidget.class), v);
+            }
+          
+            static void msg(RemoteViews v, String t) { v.setViewVisibility(R.id.msg, View.VISIBLE); v.setTextViewText(R.id.msg, t); }
+          }
+          DVEOF
+      - name: Surinkti APK
+        working-directory: app_src
+        run: gradle assembleDebug --no-daemon
+      - name: Paskelbti
+        run: |
+          cp app_src/app/build/outputs/apk/debug/app-debug.apk DeivaroValdiklis.apk
+          gh release delete valdiklis -y --cleanup-tag -R "$GITHUB_REPOSITORY" || true
+          gh release create valdiklis DeivaroValdiklis.apk -R "$GITHUB_REPOSITORY" -t "Deivaro valdiklis" -n "Atsisiusk ir isidiek telefone."
+        env:
+          GH_TOKEN: ${{ github.token }}
